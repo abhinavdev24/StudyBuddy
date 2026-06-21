@@ -3,7 +3,7 @@
 Upload any study material (PDF or pasted notes). StudyBuddy extracts the key concepts, generates
 quizzes at adaptive difficulty, grades your answers, tracks your weak spots across sessions,
 **re-drills exactly what you got wrong** (at higher difficulty as you improve), and gives you a
-**conversational tutor agent** that answers open-ended questions about your material *and* drives
+**conversational tutor agent** that answers open-ended questions about your material _and_ drives
 the app (start a quiz, explain a concept, report weak spots) by calling tools. The system gets
 smarter the more you use it: every wrong answer feeds back into what it asks you next.
 
@@ -73,14 +73,14 @@ flowchart TD
     class VS,TRACK store;
 ```
 
-| Agent | Job | Model (configurable) |
-|-------|-----|----------------------|
-| **Ingest** | parse PDF / pasted text → topic chunks → embed into Chroma | none (PyMuPDF, local embeddings) |
-| **Concept Extraction** | chunks → key terms, definitions, ideas | `EXTRACTION_MODEL` (e.g. GPT-4o) |
-| **Quiz Generation** | grounded concepts → MCQ / true-false / short-answer × 3 difficulties | `QUIZ_MODEL` (e.g. Claude 3.5 Sonnet) |
-| **Evaluator** | grade answers vs. retrieved source + explain why | `EVAL_MODEL` (e.g. Gemini Flash) |
-| **Adaptive** | read weak-spot scores → plan the re-drill | `ADAPTIVE_MODEL` (e.g. Claude 3 Haiku) |
-| **Tutor (tool-calling)** | answer open-ended questions (RAG) + drive the app via tools | `TUTOR_MODEL` (e.g. GPT-4o) |
+| Agent                    | Job                                                                  | Model (configurable)                   |
+| ------------------------ | -------------------------------------------------------------------- | -------------------------------------- |
+| **Ingest**               | parse PDF / pasted text → topic chunks → embed into Chroma           | none (PyMuPDF, local embeddings)       |
+| **Concept Extraction**   | chunks → key terms, definitions, ideas                               | `EXTRACTION_MODEL` (e.g. GPT-4o)       |
+| **Quiz Generation**      | grounded concepts → MCQ / true-false / short-answer × 3 difficulties | `QUIZ_MODEL` (e.g. Claude 3.5 Sonnet)  |
+| **Evaluator**            | grade answers vs. retrieved source + explain why                     | `EVAL_MODEL` (e.g. Gemini Flash)       |
+| **Adaptive**             | read weak-spot scores → plan the re-drill                            | `ADAPTIVE_MODEL` (e.g. Claude 3 Haiku) |
+| **Tutor (tool-calling)** | answer open-ended questions (RAG) + drive the app via tools          | `TUTOR_MODEL` (e.g. GPT-4o)            |
 
 **Stack — the full LangChain ecosystem:** `ChatOpenAI` models, `ChatPromptTemplate` prompts, **LCEL**
 chains, `.with_structured_output()` for typed results, **Chroma** retrieval, a **tool-calling agent**
@@ -98,16 +98,21 @@ Full design: **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 ## Quickstart
 
 ### 1. Environment
+
 All Python runs through the conda env `mlopsenv`:
+
 ```bash
 conda run -n mlopsenv pip install -r requirements.txt
 ```
 
 ### 2. Configure
+
 Copy `.env.example` to `.env` and fill in your gateway + per-agent models:
+
 ```bash
 cp .env.example .env
 ```
+
 ```dotenv
 OPENAI_API_KEY=your-gateway-key
 OPENAI_BASE_URL=https://openrouter.ai/api/v1   # any OpenAI-compatible gateway
@@ -126,18 +131,50 @@ TUTOR_MODEL=gpt-4o                                # must support tool calling
 # LANGCHAIN_API_KEY=ls-...
 # LANGCHAIN_PROJECT=studybuddy
 ```
+
 Embeddings run **locally** (sentence-transformers), so retrieval works even if your chat gateway
 doesn't serve embeddings. Never commit `.env`. Full env-var reference: [ARCHITECTURE.md §4.3](ARCHITECTURE.md).
 
 ### 3. Run
 
 **Locally (Gradio):**
+
 ```bash
 conda run -n mlopsenv python -m studybuddy.ui
 ```
 
 **In Colab:** open `notebooks/StudyBuddy_demo.ipynb`, set the env vars in the
 first cell, then **Runtime → Run all**. The Gradio app launches via a share link.
+
+---
+
+## Screenshots
+
+**Upload & ingest** — drop a PDF (or paste notes); StudyBuddy extracts key concepts and indexes them.
+
+![Upload and ingest](screenshots/01-upload-ingest.png)
+
+**Adaptive quizzes** — configure count, types, difficulty, and concept scope, then answer a grounded round.
+
+![Quiz options](screenshots/02-quiz-options.png)
+![Quiz questions](screenshots/03-quiz-questions.png)
+
+**Grounded feedback** — answers are graded against the source with per-question explanations.
+
+![Quiz results](screenshots/04-quiz-results.png)
+
+**Flashcards** — generate expandable cards from your material.
+
+![Flashcards](screenshots/05-flashcards.png)
+
+**Dashboard** — concept mastery, a per-concept accuracy trend, weakness re-drills, and cheat-sheets.
+
+![Dashboard](screenshots/06-dashboard.png)
+![Cheat sheet](screenshots/07-cheat-sheet.png)
+
+**Tutor agent** — a tool-calling conversational tutor that answers questions and drives the app.
+
+![Tutor](screenshots/08-tutor.png)
 
 ---
 

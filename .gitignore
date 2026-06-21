@@ -5,3 +5,5 @@ __pycache__/
 node_modules
 .serena/
 .gradio
+.vscode
+.DS_Store
